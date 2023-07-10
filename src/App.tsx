@@ -1,164 +1,68 @@
-import React, { useState, useEffect } from "react";
-import ApiFetch from "./service/ApiCalls/request";
-import { Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import logo from "./logo.svg";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import Dashboard from "./pages/dashboard";
+import CoinPage from "./pages/coin";
 import "./App.css";
-import { appendFile } from "fs";
 
-interface DataTypeDeposit {
-  amount: number;
-  fromAddress: string;
-}
+const CoinSubMenu = () => {
+  const [isSubMenuVisible, setSubMenuVisible] = useState(false);
 
-interface DataTypeWithdrawls {
-  amount: number;
-  toAddress: string;
-  wasApprovedByUser2FA: boolean;
-}
-
-interface DataTypeTradeOrder {
-  amount: number;
-  tradeOrderType: {
-    name: string;
+  const handleClick = () => {
+    setSubMenuVisible(!isSubMenuVisible);
   };
-}
-
-const columnsDeposit: ColumnsType<DataTypeDeposit> = [
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    width: 150,
-  },
-  {
-    title: "From Address",
-    dataIndex: "fromAddress",
-  },
-];
-
-const columnsTradeOrders: ColumnsType<DataTypeTradeOrder> = [
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    width: 150,
-  },
-  {
-    title: "Trade Order Type",
-    dataIndex: ["tradeOrderType", "name"],
-  },
-];
-
-const columnsWithdrawals: ColumnsType<DataTypeWithdrawls> = [
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    width: 150,
-  },
-  {
-    title: "ToAddress",
-    dataIndex: "toAddress",
-  },
-  {
-    title: "2FA Confirmed",
-    dataIndex: "wasApprovedByUser2FA",
-    key: "isActive",
-    render: (isActive:any) => (isActive ? "True" : "False"),
-  },
-];
-// ======================================
-function App() {
-  const [data, setData] = useState<any>();
-  const [options, setOptions] = useState([]);
-  const [selectedValue, setSelectedValue] = useState("Deposit");
-
-  const handleSelectDropDown = (event: any) => {
-    setSelectedValue(event.target.value);
+  const handleMouseLeave = () => {
+    setSubMenuVisible(!isSubMenuVisible);
   };
 
-  useEffect(() => {
-    const fetchDropDown = async () => {
-      try {
-        const response = await fetch(ApiFetch.fetchOperationTypes);
-        const data = await response.json();
-        const newOptions = data.map((item: any) => ({
-          value: item.id,
-          label: item.name,
-        }));
-        setOptions(newOptions);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchDropDown();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let url = "";
-        switch (selectedValue) {
-          case "Deposit":
-            url = ApiFetch.fetchDeposits;
-            break;
-          case "Withdrawal":
-            url = ApiFetch.fetchWithdrawals;
-            break;
-          case "TradeOrder":
-            url = ApiFetch.fetchTradeOrder;
-            break;
-          default:
-            url = "";
-        }
-        if (url) {
-          const response = await fetch(url);
-          const json = await response.json();
-          setData(json);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-  }, [selectedValue]);
-
-  console.log("FETCH: ", data);
-  console.log("dp value is: ", selectedValue);
   return (
-    <div className="App">
-      <h1>Operation table</h1>
-      <select value={selectedValue} onChange={handleSelectDropDown}>
-        {options.map((option: any) => (
-          <option key={option.value} value={option.label}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <div className="Table-grid">
-        {selectedValue === "Deposit" ? (
-          <Table
-            columns={columnsDeposit}
-            dataSource={data}
-            pagination={{ pageSize: 5 }}
-            scroll={{ y: 300 }}
-          />
-        ) : selectedValue === "Withdrawal" ? (
-          <Table
-            columns={columnsWithdrawals}
-            dataSource={data}
-            pagination={{ pageSize: 5 }}
-            scroll={{ y: 300 }}
-          />
-        ) : (
-          <Table
-            columns={columnsTradeOrders}
-            dataSource={data}
-            pagination={{ pageSize: 5 }}
-            scroll={{ y: 300 }}
-          />
-        )}
-      </div>
+    <div className="nav-dropdown">
+      <button className="nav-link" onClick={handleClick}>
+        Coin options
+      </button>
+      {isSubMenuVisible && (
+        <ul
+          onClick={handleClick}
+          onMouseLeave={handleMouseLeave}
+          className="sub-menu"
+        >
+          <li>
+            <Link to="/coin/create">Show all</Link>
+          </li>
+          <li>
+            <Link to="/coin/create">Create</Link>
+          </li>
+          <li>
+            <Link to="/coin/edit">Edit</Link>
+          </li>
+          <li>
+            <Link to="/coin/delete">Delete</Link>
+          </li>
+        </ul>
+      )}
     </div>
   );
-}
+};
+
+const App = () => {
+  return (
+    <Router>
+      <div>
+        <nav className="navbar">
+          <Link to="/dashboard" className="nav-link">
+            Dashboard
+          </Link>
+          <CoinSubMenu />
+        </nav>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/coin/create" element={<div>Create Page</div>} />
+          <Route path="/coin/edit" element={<div>Edit Page</div>} />
+          <Route path="/coin/delete" element={<div>Delete Page</div>} />
+          <Route path="/coin" element={<CoinPage />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+};
 
 export default App;

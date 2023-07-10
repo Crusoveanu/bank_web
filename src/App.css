@@ -38,7 +38,66 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.navbar {
+  background-color: #f0f0f0;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-link {
+  margin: 0 10px;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.nav-link:hover {
+  color: #555;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.Table-grid {
+  margin-top: 20px;
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.sub-menu {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  background-color: #f0f0f0;
+  padding: 10px;
+  z-index: 1;
+}
+
+.nav-dropdown:hover .sub-menu {
+  display: block;
+}
+
+.sub-menu li {
+  list-style: none;
+  margin-bottom: 5px;
+}
+
+.sub-menu li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.sub-menu li a:hover {
+  color: #555;
 }
